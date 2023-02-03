@@ -1,6 +1,6 @@
 #!/bin/bash
 #adduser
-sudo chpasswd << 'END' mehrdad:Mehrdad@123 END
+
 
 if [ $(id -u) -eq 0 ]; then
 	read -p "Enter username : " username
