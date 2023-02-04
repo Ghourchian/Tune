@@ -2,24 +2,6 @@
 #adduser
 
 
-if [ $(id -u) -eq 0 ]; then
-	read -p "Enter username : " username
-	read -s -p "Enter password : " password
-	egrep "^$username" /etc/passwd >/dev/null
-	if [ $? -eq 0 ]; then
-		echo "$username exists!"
-		exit 1
-	else
-		pass=$(perl -e 'print crypt($ARGV[0], "password")' $password)
-		useradd -m -p "$pass" "$username"
-		[ $? -eq 0 ] && echo "User has been added to system!" || echo "Failed to add a user!"
-	fi
-else
-	echo "Only root may add a user to the system."
-	exit 2
-fi
-
-echo '$username ALL=(ALL) NOPASSWD:ALL ' >> /etc/sudoers
 
 
 
@@ -72,8 +54,7 @@ edit_sshd_config(){
   /usr/bin/echo "${param[2]} yes" >> ${file}
   /usr/bin/echo "'${param[2]} yes' was added to ${file}."
   #/usr/bin/echo "${param[4]} .ssh/authorized_keys" >> ${file}
-  #/usr/bin/echo "'${param[4]} .ssh/authorized_keys' was added to 
-${file}."
+  #/usr/bin/echo "'${param[4]} .ssh/authorized_keys' was added to ${file}."
   /usr/bin/echo "${param[4]} yes" >> ${file}
   /usr/bin/echo "'${param[4]} yes' was added to ${file}."
 
@@ -110,3 +91,23 @@ fi
 backup_sshd_config
 edit_sshd_config
 reload_sshd
+
+if [ $(id -u) -eq 0 ]; then
+	read -p "Enter username : " username
+	read -s -p "Enter password : " password
+	egrep "^$username" /etc/passwd >/dev/null
+	if [ $? -eq 0 ]; then
+		echo "$username exists!"
+		exit 1
+	else
+		pass=$(perl -e 'print crypt($ARGV[0], "password")' $password)
+		useradd -m -p "$pass" "$username"
+		[ $? -eq 0 ] && echo "User has been added to system!" || echo "Failed to add a user!"
+	fi
+else
+	echo "Only root may add a user to the system."
+	exit 2
+fi
+
+echo "'$username' ALL=(ALL) NOPASSWD:ALL " >> /etc/sudoers
+
